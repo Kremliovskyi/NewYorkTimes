@@ -6,4 +6,5 @@
 
     <color name="black_overlay">#66000000</color>
     <color name="background">#ECEFF1</color>
+    <color name="stroke_color">#37474F</color>
 </resources>

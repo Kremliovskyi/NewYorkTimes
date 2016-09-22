@@ -1,4 +1,4 @@
-package com.example.akremlov.nytimes;
+package com.example.akremlov.nytimes.utils;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,10 +9,13 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 
+import com.example.akremlov.nytimes.database.UserDb;
+
 /**
  * Created by akremlov on 20.09.16.
  */
 public class UsersProvider extends ContentProvider {
+
     private UserDb mDb;
     private UriMatcher mMatcher = buildMatcher();
     private static final int USER = 100;

@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:orientation="vertical"
-    tools:context="com.example.akremlov.nytimes.SignUp">
+    android:id="@+id/linearLayout"
+    tools:context="com.example.akremlov.nytimes.activity.SignUpActivity">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="60dp"
