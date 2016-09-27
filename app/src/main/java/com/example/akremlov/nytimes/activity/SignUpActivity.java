@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
+import com.example.akremlov.nytimes.utils.Constants;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.ArrayList;
@@ -148,7 +149,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
-                                        intent.putExtra(getString(R.string.activity), getString(R.string.SignUpActivity));
+                                        intent.putExtra(Constants.ACTIVITY, Constants.SIGN_UP_ACTIVITY);
                                         startActivity(intent);
                                     }
                                 })

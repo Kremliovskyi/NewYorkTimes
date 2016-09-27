@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.akremlov.nytimes.R;
+import com.example.akremlov.nytimes.utils.Constants;
 
 public class LandingActivity extends AppCompatActivity {
 
@@ -17,7 +18,7 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LandingActivity.this, SignUpActivity.class);
-                intent.putExtra(getString(R.string.activity), "LandingActivity");
+                intent.putExtra(Constants.ACTIVITY, Constants.LANDING_ACTIVITY);
                 startActivity(intent);
                 finish();
             }
@@ -26,7 +27,7 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LandingActivity.this, LogInActivity.class);
-                intent.putExtra(getString(R.string.activity), "LandingActivity");
+                intent.putExtra(Constants.ACTIVITY, Constants.LANDING_ACTIVITY);
                 startActivity(intent);
                 finish();
             }

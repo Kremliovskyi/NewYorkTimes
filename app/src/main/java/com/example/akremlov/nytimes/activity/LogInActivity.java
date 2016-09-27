@@ -15,6 +15,7 @@ import android.widget.EditText;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
+import com.example.akremlov.nytimes.utils.Constants;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.HashMap;
@@ -107,13 +108,13 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = getIntent();
-        String activity = intent.getStringExtra(getString(R.string.activity));
+        String activity = intent.getStringExtra(Constants.ACTIVITY);
         switch (activity) {
-            case "SignUpActivity":
+            case Constants.SIGN_UP_ACTIVITY:
                 Intent signUpIntent = new Intent(this, SignUpActivity.class);
                 startActivity(signUpIntent);
                 break;
-            case "LandingActivity":
+            case Constants.LANDING_ACTIVITY:
                 Intent landingActivityIntent = new Intent(this, LandingActivity.class);
                 startActivity(landingActivityIntent);
                 break;
