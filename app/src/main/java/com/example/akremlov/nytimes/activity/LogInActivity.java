@@ -35,7 +35,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        getCredentialFromDB(cursor);
+        mCredentialsFromDB = getCredentialFromDB(cursor);
         if (validateCredentials()) {
             finish();
         }
@@ -68,15 +68,60 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mLoginButton.setOnClickListener(this);
     }
 
-    public boolean validateCredentials() {
-        String username = mUsernameLogIn.getText().toString();
+    private boolean validateCredentials() {
+        String userName = mUsernameLogIn.getText().toString();
         String password = mPasswordLogin.getText().toString();
-        String userPass = mCredentialsFromDB.get(username);
+        String userPass = mCredentialsFromDB.get(userName);
         if (userPass != null && userPass.equals(password)) {
             Intent intent = new Intent(LogInActivity.this, MainActivity.class);
             startActivity(intent);
             return true;
         }
+        showAuthenticationFailedDialog();
+        return false;
+    }
+
+    public Map<String, String> getCredentialFromDB(Cursor cursor) {
+        Map<String, String> credentialsFromDB = new HashMap<>();
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            String usernameFromDB = cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.USERNAME));
+                            String passwordFromDB = cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.PASSWORD));
+                            credentialsFromDB.put(usernameFromDB, passwordFromDB);
+                        } while (cursor.moveToNext());
+                    }
+                } catch (Exception e ) {
+
+                } finally {
+                    cursor.close();
+                }
+
+                return credentialsFromDB;
+            }
+        return null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = getIntent();
+        String activity = intent.getStringExtra(getString(R.string.activity));
+        switch (activity) {
+            case "SignUpActivity":
+                Intent signUpIntent = new Intent(this, SignUpActivity.class);
+                startActivity(signUpIntent);
+                break;
+            case "LandingActivity":
+                Intent landingActivityIntent = new Intent(this, LandingActivity.class);
+                startActivity(landingActivityIntent);
+                break;
+            default:
+        }
+    }
+
+    private void showAuthenticationFailedDialog() {
         new AlertDialog.Builder(LogInActivity.this).setTitle(R.string.authentication_failed)
                 .setMessage(R.string.credentials_not_registered)
                 .setPositiveButton(R.string.sign_up, new DialogInterface.OnClickListener() {
@@ -94,37 +139,5 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                         dialog.dismiss();
                     }
                 }).show();
-        return false;
-    }
-
-    public void getCredentialFromDB(Cursor cursor) {
-        if (mCredentialsFromDB.isEmpty()) {
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        String usernameFromDB = cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.USERNAME));
-                        String passwordFromDB = cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.PASSWORD));
-                        mCredentialsFromDB.put(usernameFromDB, passwordFromDB);
-                    } while (cursor.moveToNext());
-                }
-                cursor.close();
-            }
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = getIntent();
-        String activity = intent.getStringExtra("activity");
-        switch (activity) {
-            case "SignUpActivity":
-                Intent signUpIntent = new Intent(this, SignUpActivity.class);
-                startActivity(signUpIntent);
-                break;
-            case "LandingActivity":
-                Intent landingActivityIntent = new Intent(this, LandingActivity.class);
-                startActivity(landingActivityIntent);
-        }
     }
 }

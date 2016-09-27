@@ -13,21 +13,21 @@
         android:src="@drawable/nytimeslogo"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp" />
+        android:layout_marginTop="@dimen/edit_text_margin" />
 
     <Button
-        android:layout_width="100dp"
+        android:layout_width="@dimen/button_width_landing"
         android:layout_height="wrap_content"
         android:layout_below="@id/placeholder_user"
-        android:layout_margin="46dp"
+        android:layout_margin="@dimen/edit_text_margin"
         android:id="@+id/sign_up"
         android:text="@string/sign_up" />
 
     <Button
-        android:layout_width="100dp"
+        android:layout_width="@dimen/button_width_landing"
         android:layout_height="wrap_content"
         android:layout_below="@id/placeholder_user"
-        android:layout_margin="46dp"
+        android:layout_margin="@dimen/edit_text_margin"
         android:layout_alignParentRight="true"
         android:id="@+id/log_in"
         android:text="@string/log_in" />

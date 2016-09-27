@@ -17,7 +17,7 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LandingActivity.this, SignUpActivity.class);
-                intent.putExtra("activity", "LandingActivity");
+                intent.putExtra(getString(R.string.activity), "LandingActivity");
                 startActivity(intent);
                 finish();
             }
@@ -26,7 +26,7 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LandingActivity.this, LogInActivity.class);
-                intent.putExtra("activity", "LandingActivity");
+                intent.putExtra(getString(R.string.activity), "LandingActivity");
                 startActivity(intent);
                 finish();
             }

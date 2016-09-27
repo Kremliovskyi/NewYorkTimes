@@ -24,7 +24,7 @@ public class UsersProvider extends ContentProvider {
     private UriMatcher buildMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(UsersContract.AUTHORITY, UserDb.TABLE_NAME, USERS);
-        matcher.addURI(UsersContract.AUTHORITY, UserDb.TABLE_NAME+"/*", USER);
+        matcher.addURI(UsersContract.AUTHORITY, UserDb.TABLE_NAME + "/*", USER);
         return matcher;
     }
 
@@ -99,8 +99,7 @@ public class UsersProvider extends ContentProvider {
         int code = mMatcher.match(uri);
         switch (code) {
             case USERS:
-                String id = UsersContract.getUserId(uri);
-                return database.update(UserDb.TABLE_NAME, values, BaseColumns._ID + " = " + id, selectionArgs);
+                return database.update(UserDb.TABLE_NAME, values, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Incorrect URI " + uri);
         }

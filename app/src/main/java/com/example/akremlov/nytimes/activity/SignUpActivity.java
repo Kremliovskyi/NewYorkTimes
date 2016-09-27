@@ -41,23 +41,28 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
     private Button mSignIn;
     private LinearLayout mLinearLayout;
     private List<String> mUserNames;
-    private static final String[] PROJECTION = {UserDb.DBColumns.USERNAME, UserDb.DBColumns.EMAIL,
+    private static final String[] COLUMNS_TO_SEARCH = {UserDb.DBColumns.USERNAME, UserDb.DBColumns.EMAIL,
             UserDb.DBColumns.PASSWORD};
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, UsersContract.TABLE_URI, PROJECTION, null, null, null);
+        return new CursorLoader(this, UsersContract.TABLE_URI, COLUMNS_TO_SEARCH, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (mUserNames.isEmpty()) {
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        mUserNames.add(cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.USERNAME)));
-                    } while (cursor.moveToNext());
+            try {
+                if (cursor != null) {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            mUserNames.add(cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.USERNAME)));
+                        } while (cursor.moveToNext());
+                    }
                 }
+            } catch (Exception e) {
+
+            } finally {
                 cursor.close();
             }
         }
@@ -113,7 +118,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         !TextUtils.isEmpty(enterPasswordInput.toString()) &&
                         !TextUtils.isEmpty(confirmPasswordInput.toString())) {
 
-                    String username = usernameInput.toString();
+                    String userName = usernameInput.toString();
                     String email = emailInput.toString();
                     String password = enterPasswordInput.toString();
                     String confirmPassword = confirmPasswordInput.toString();
@@ -134,7 +139,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         return;
                     }
 
-                    if (mUserNames.contains(username)) {
+                    if (mUserNames.contains(userName)) {
                         new AlertDialog.Builder(SignUpActivity.this)
                                 .setTitle(R.string.sign_up_failed)
                                 .setMessage(R.string.user_already_registered)
@@ -143,7 +148,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
-                                        intent.putExtra("activity", "SignUpActivity");
+                                        intent.putExtra(getString(R.string.activity), getString(R.string.SignUpActivity));
                                         startActivity(intent);
                                     }
                                 })
@@ -158,8 +163,9 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         return;
                     }
 
-                    createUserAccount(username, email, password);
+                    createUserAccount(userName, email, password);
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+                    intent.putExtra(getString(R.string.username), userName);
                     startActivity(intent);
                 } else {
                     Toast.makeText(SignUpActivity.this, R.string.fill_request, Toast.LENGTH_SHORT).show();

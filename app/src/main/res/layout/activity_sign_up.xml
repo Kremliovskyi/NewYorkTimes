@@ -3,24 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/background_main"
     android:orientation="vertical"
     android:id="@+id/linearLayout"
     tools:context="com.example.akremlov.nytimes.activity.SignUpActivity">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="@dimen/header_text"
         android:text="@string/sign_up_title"
-        android:textSize="32sp"
+        android:textSize="@dimen/header_text_size"
         android:gravity="center"
-        android:background="#78909C"
-        android:textColor="#FFFFFF"
+        android:background="@color/background_header"
+        android:textColor="@android:color/white"
         android:id="@+id/sign_up_text"/>
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginTop="@dimen/edit_text_margin"
         android:hint="@string/username"
         android:ellipsize="start"
         android:gravity="center"
@@ -29,12 +29,12 @@
         android:id="@+id/username_input"
         android:background="@drawable/rectangle"
         android:cursorVisible="false"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"/>
     <android.support.v7.widget.AppCompatEditText
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginTop="@dimen/edit_text_margin"
         android:hint="@string/email"
         android:ellipsize="start"
         android:gravity="center"
@@ -42,12 +42,12 @@
         android:maxLines="1"
         android:id="@+id/email_input"
         android:background="@drawable/rectangle"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"/>
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginTop="@dimen/edit_text_margin"
         android:hint="@string/enter_password"
         android:ellipsize="start"
         android:gravity="center"
@@ -55,12 +55,12 @@
         android:maxLines="1"
         android:id="@+id/enter_password_input"
         android:background="@drawable/rectangle"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"/>
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginTop="@dimen/edit_text_margin"
         android:hint="@string/confirm_pasword"
         android:ellipsize="start"
         android:gravity="center"
@@ -68,15 +68,14 @@
         android:maxLines="1"
         android:id="@+id/confirm_password_input"
         android:background="@drawable/rectangle"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/sign_in"
         android:layout_marginBottom="40dp"
         android:text="@string/sign_in"
-        android:textColor="#263238"
         android:layout_gravity="center"
         android:layout_marginTop="26dp"/>
 
