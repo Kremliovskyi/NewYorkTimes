@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_main"
+    android:orientation="vertical"
+    tools:context="com.example.akremlov.nytimes.activity.SignUpActivity">
+
+    <TextView
+        android:id="@+id/sign_up_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_text"
+        android:background="@color/background_header"
+        android:gravity="center"
+        android:text="@string/sign_up_title"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/header_text_size" />
+
+    <EditText
+        android:id="@+id/username_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:background="@drawable/rectangle"
+        android:cursorVisible="false"
+        android:ellipsize="start"
+        android:gravity="center"
+        android:hint="@string/username"
+        android:inputType="text"
+        android:maxLines="1" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/email_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:background="@drawable/rectangle"
+        android:ellipsize="start"
+        android:gravity="center"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:maxLines="1" />
+
+    <EditText
+        android:id="@+id/enter_password_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:background="@drawable/rectangle"
+        android:ellipsize="start"
+        android:gravity="center"
+        android:hint="@string/enter_password"
+        android:inputType="textPassword"
+        android:maxLines="1" />
+
+    <EditText
+        android:id="@+id/confirm_password_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_text_height"
+        android:layout_marginEnd="@dimen/edit_text_margin"
+        android:layout_marginStart="@dimen/edit_text_margin"
+        android:layout_marginTop="@dimen/edit_text_margin"
+        android:background="@drawable/rectangle"
+        android:ellipsize="start"
+        android:gravity="center"
+        android:hint="@string/confirm_pasword"
+        android:inputType="textPassword"
+        android:maxLines="1" />
+
+    <Button
+        android:id="@+id/sign_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="26dp"
+        android:text="@string/sign_in" />
+
+
+</LinearLayout>
