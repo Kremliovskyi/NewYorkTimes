@@ -7,12 +7,19 @@ import android.view.View;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
 
 public class LandingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean isUserLoggedIn = LogInSharedPreferences.getBooleanValue(this);
+        if (isUserLoggedIn) {
+            Intent intent = new Intent(LandingActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
         setContentView(R.layout.activity_login_screen);
         findViewById(R.id.sign_up).setOnClickListener(new View.OnClickListener() {
             @Override

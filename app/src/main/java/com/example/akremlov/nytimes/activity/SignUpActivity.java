@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.ArrayList;
@@ -151,6 +152,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                                         Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
                                         intent.putExtra(Constants.ACTIVITY, Constants.SIGN_UP_ACTIVITY);
                                         startActivity(intent);
+                                        finish();
                                     }
                                 })
                                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -166,14 +168,22 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
 
                     createUserAccount(userName, email, password);
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    intent.putExtra(getString(R.string.username), userName);
+                    intent.putExtra(Constants.USERNAME, userName);
                     startActivity(intent);
+                    LogInSharedPreferences.setBooleanValue(SignUpActivity.this, true);
+                    LogInSharedPreferences.setUserName(SignUpActivity.this, userName);
+                    finish();
                 } else {
                     Toast.makeText(SignUpActivity.this, R.string.fill_request, Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override

@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.akremlov.nytimes">
 
-   
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -23,17 +26,39 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SignUpActivity"
-            android:theme="@style/AppTheme">
+        <activity
+            android:name=".activity.SignUpActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.LogInActivity"
+            android:theme="@style/AppTheme" />
 
-        </activity>
-        <activity android:name=".activity.LogInActivity"
-            android:theme="@style/AppTheme">
-
-        </activity>
         <provider
             android:name=".utils.UsersProvider"
-            android:authorities="com.example.akremlov.nytimes.provider"/>
+            android:authorities="com.example.akremlov.nytimes.provider" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.example.akremlov.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".activity.WebViewActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver
+            android:name=".utils.InternetChangeReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

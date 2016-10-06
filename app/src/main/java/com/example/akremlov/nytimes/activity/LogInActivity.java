@@ -16,6 +16,7 @@ import android.widget.EditText;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.HashMap;
@@ -38,13 +39,14 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mCredentialsFromDB = getCredentialFromDB(cursor);
         if (validateCredentials()) {
+            LogInSharedPreferences.setBooleanValue(this, true);
             finish();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        loader.reset();
     }
 
     @Override
@@ -69,6 +71,11 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mLoginButton.setOnClickListener(this);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     private boolean validateCredentials() {
         String userName = mUsernameLogIn.getText().toString();
         String password = mPasswordLogin.getText().toString();
@@ -76,6 +83,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         if (userPass != null && userPass.equals(password)) {
             Intent intent = new Intent(LogInActivity.this, MainActivity.class);
             startActivity(intent);
+            LogInSharedPreferences.setUserName(this, userName);
             return true;
         }
         showAuthenticationFailedDialog();
