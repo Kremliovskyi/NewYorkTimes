@@ -18,42 +18,27 @@ public class NYItem implements Parcelable {
     private String mHeadLine;
     private String mSnippet;
 
-    public NYItem(String mWebUrl, String mPhoto, String mHeadLine, String mSnippet) {
-        this.mWebUrl = mWebUrl;
-        if (!TextUtils.isEmpty(mPhoto)) {
-            this.mPhoto = Uri.parse("http://www.nytimes.com/").buildUpon().appendEncodedPath(mPhoto).toString();
-        } else {
-            this.mPhoto = "";
-        }
-        this.mHeadLine = mHeadLine;
-        this.mSnippet = mSnippet;
+    private NYItem(NYItemBuilder builder) {
+
+        this.mWebUrl = builder.mWebUrl;
+        this.mPhoto = builder.mPhoto;
+        this.mHeadLine = builder.mHeadLine;
+        this.mSnippet = builder.mSnippet;
     }
 
-    public String getmWebUrl() {
+    public String getWebUrl() {
         return mWebUrl;
     }
 
-    public void setmWebUrl(String mWebUrl) {
-        this.mWebUrl = mWebUrl;
-    }
-
-    public String getmPhoto() {
+    public String getPhoto() {
         return mPhoto;
     }
 
-    public void setmPhoto(String mPhoto) {
-        this.mPhoto = mPhoto;
-    }
-
-    public String getmHeadLine() {
+    public String getHeadLine() {
         return mHeadLine;
     }
 
-    public void setmHeadLine(String mHeadLine) {
-        this.mHeadLine = mHeadLine;
-    }
-
-    public String getmSnippet() {
+    public String getSnippet() {
         return mSnippet;
     }
 
@@ -112,5 +97,40 @@ public class NYItem implements Parcelable {
             return new NYItem[size];
         }
     };
+
+
+    public static class NYItemBuilder {
+
+        private String mWebUrl;
+        private String mPhoto;
+        private String mHeadLine;
+        private String mSnippet;
+
+        public NYItemBuilder setWebUrl(String webUrl) {
+            this.mWebUrl = webUrl;
+            return this;
+        }
+
+        public NYItemBuilder setPhoto(String photo) {
+            this.mPhoto = photo;
+            return this;
+        }
+
+        public NYItemBuilder setHeadLine(String headLine) {
+            this.mHeadLine = headLine;
+            return this;
+        }
+
+        public NYItemBuilder setSnippet(String snippet) {
+            this.mSnippet = snippet;
+            return this;
+        }
+
+        public NYItem build() {
+            return new NYItem(this);
+        }
+
+
+    }
 
 }

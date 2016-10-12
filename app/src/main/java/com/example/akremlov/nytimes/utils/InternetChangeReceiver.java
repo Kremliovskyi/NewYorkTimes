@@ -23,8 +23,6 @@ public class InternetChangeReceiver extends BroadcastReceiver {
             } else {
                 Toast.makeText(context, " Not Connected", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(context, " Not Connected", Toast.LENGTH_SHORT).show();
         }
     }
 

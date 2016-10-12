@@ -9,4 +9,8 @@
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="FilterView">
+        <attr name="text" format="string"/>
+        <attr name="isChecked" format="boolean"/>
+    </declare-styleable>
 </resources>

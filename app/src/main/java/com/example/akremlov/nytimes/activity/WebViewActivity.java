@@ -24,7 +24,9 @@ public class WebViewActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new Callback());
         if (savedInstanceState == null) {
-            mWebView.loadUrl(getIntent().getStringExtra("url"));
+            if (getIntent() != null && getIntent().getStringExtra("url") != null) {
+                mWebView.loadUrl(getIntent().getStringExtra("url"));
+            }
         }
     }
 
@@ -49,6 +51,8 @@ public class WebViewActivity extends AppCompatActivity {
 
     private class Callback extends WebViewClient {
 
+        /**  Overriding this method and setting return to false
+            to have the site loaded to WebView not the system default browser */
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return false;

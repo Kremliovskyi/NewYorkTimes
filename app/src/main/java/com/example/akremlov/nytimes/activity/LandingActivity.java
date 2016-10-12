@@ -7,15 +7,14 @@ import android.view.View;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.utils.Constants;
-import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 
 public class LandingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean isUserLoggedIn = LogInSharedPreferences.getBooleanValue(this);
-        if (isUserLoggedIn) {
+        if (NYSharedPreferences.getsInstance().getUserLoggedIn()) {
             Intent intent = new Intent(LandingActivity.this, MainActivity.class);
             startActivity(intent);
             finish();

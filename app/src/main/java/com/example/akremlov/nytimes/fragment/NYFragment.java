@@ -43,6 +43,7 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         Bundle sBundle = new Bundle();
         //Page number is associated with queries in assets
         sBundle.putString(Constants.QUERY, query);
+        sBundle.putInt(Constants.PAGE_NUMBER, 0);
         nyFragment.setArguments(sBundle);
         return nyFragment;
     }
@@ -54,8 +55,8 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         mContext = getActivity().getBaseContext();
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
         if (savedInstanceState != null) {
-            mLinearLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable("layoutManager"));
-            mDataList = savedInstanceState.getParcelableArrayList("data");
+            mLinearLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(Constants.LAYOUT_MANAGER));
+            mDataList = savedInstanceState.getParcelableArrayList(Constants.DATA);
         }
     }
 
@@ -63,8 +64,8 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (outState != null) {
-            outState.putParcelable("layoutManager", mLinearLayoutManager.onSaveInstanceState());
-            outState.putParcelableArrayList("data", mDataList);
+            outState.putParcelable(Constants.LAYOUT_MANAGER, mLinearLayoutManager.onSaveInstanceState());
+            outState.putParcelableArrayList(Constants.DATA, mDataList);
         }
     }
 
@@ -89,22 +90,30 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
 
     @Override
     public void onLoadFinished(Loader<List<NYItem>> loader, List<NYItem> data) {
-        //Delete it!!! Filter items with image only
-//        Iterator<NYItem> itemIterator = data.iterator();
-//        while(itemIterator.hasNext()){
-//            if(TextUtils.isEmpty(itemIterator.next().getmPhoto())){
-//                itemIterator.remove();
-//            }
-//        }
-        if (!mDataList.containsAll(data)) {
-            if (loader.getId() == Constants.ARTICLES) {
-                mDataList.addAll(data);
-                nyRecyclerAdapter.notifyDataSetChanged();
-            } else if (loader.getId() == Constants.REFRESH_ARTICLES) {
-                mDataList.addAll(0, data);
-                nyRecyclerAdapter.notifyDataSetChanged();
-            }
+/**    For testing. Filter items with image only
+ Iterator<NYItem> itemIterator = data.iterator();
+ while(itemIterator.hasNext()){
+ if(TextUtils.isEmpty(itemIterator.next().getPhoto())){
+ itemIterator.remove();
+ }
+ }
+ */
+
+        if (data.isEmpty()) {
+            retryLoading();
+            return;
         }
+        if (mDataList.containsAll(data)) {
+            return;
+        }
+        if (loader.getId() == Constants.ARTICLES) {
+
+            mDataList.addAll(data);
+        } else if (loader.getId() == Constants.REFRESH_ARTICLES) {
+            mDataList.addAll(0, data);
+        }
+        nyRecyclerAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -126,5 +135,9 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         bundle.putInt(Constants.PAGE_NUMBER, 0);
         getLoaderManager().restartLoader(Constants.REFRESH_ARTICLES, bundle, this).forceLoad();
         mFragment.setRefreshing(false);
+    }
+
+    public void retryLoading() {
+        getLoaderManager().restartLoader(Constants.ARTICLES, getArguments(), this).forceLoad();
     }
 }

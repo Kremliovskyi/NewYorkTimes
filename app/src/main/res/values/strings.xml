@@ -36,4 +36,15 @@
     <string name="take_new">Take new</string>
     <string name="gallery">Gallery</string>
     <string name="SignUpActivity">SignUpActivity</string>
+    <string name="settings">Settings</string>
+    <string name="filter">Filter</string>
+    <string name="log_out">Log Out</string>
+    <string name="filter_preference">filter</string>
+    <string name="filter_preference_summary">Tap to filter what NY Categories to display</string>
+    <string name="filter_preference_title">Filter categories</string>
+    <string name="log_out_preference">log_out</string>
+    <string name="log_out_preference_title">Log Out</string>
+    <string name="log_out_prompt">Do you want to log out ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

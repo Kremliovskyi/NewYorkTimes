@@ -9,10 +9,10 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        app:cardCornerRadius="4dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp">
+        android:padding="@dimen/card_view_padding"
+        app:cardCornerRadius="@dimen/card_view_corner_radius"
+        android:layout_marginTop="@dimen/card_view_margin"
+        android:layout_marginBottom="@dimen/card_view_margin">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -20,20 +20,20 @@
 
             <ImageView
                 android:id="@+id/item_photo"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="@dimen/big_image_measure"
+                android:layout_height="@dimen/big_image_measure"
                 android:layout_alignBottom="@+id/first_item_photo"
                 android:layout_alignParentEnd="true"
-                android:layout_marginBottom="21dp"
-                android:padding="12dp" />
+                android:layout_marginBottom="@dimen/big_image_margin_bottom"
+                android:padding="@dimen/big_image_padding" />
 
             <ImageView
                 android:id="@+id/first_item_photo"
-                android:layout_width="350dp"
-                android:layout_height="200dp"
+                android:layout_width="@dimen/little_image_width"
+                android:layout_height="@dimen/nav_header_height"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:padding="12dp" />
+                android:padding="@dimen/big_image_padding" />
 
             <TextView
                 android:id="@+id/headline"
@@ -42,8 +42,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@id/first_item_photo"
                 android:layout_toStartOf="@id/item_photo"
-                android:padding="8dp"
-                android:textSize="16sp"
+                android:padding="@dimen/category_upper_lower_padding"
+                android:textSize="@dimen/headline_text_size"
                 android:textStyle="bold" />
 
             <TextView
@@ -54,8 +54,8 @@
                 android:layout_below="@id/headline"
                 android:layout_gravity="center"
                 android:layout_toStartOf="@id/item_photo"
-                android:padding="8dp"
-                android:textSize="12sp" />
+                android:padding="@dimen/listview_margin_bottom"
+                android:textSize="@dimen/snippet_text_size" />
 
 
         </RelativeLayout>

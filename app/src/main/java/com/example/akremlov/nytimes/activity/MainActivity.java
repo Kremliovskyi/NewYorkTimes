@@ -16,9 +16,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
@@ -29,22 +26,23 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.content.DrawerItem;
 import com.example.akremlov.nytimes.content.NYCategoriesAdapter;
+import com.example.akremlov.nytimes.content.NYFragmentPagerAdapter;
 import com.example.akremlov.nytimes.database.UserDb;
-import com.example.akremlov.nytimes.fragment.NYFragment;
 import com.example.akremlov.nytimes.utils.Constants;
-import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +50,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,14 +58,16 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NYCategoriesAdapter.ViewPagerCategoryListener {
 
 
-    private String mCurrentPhotoPath;
+    private File mPhotoFile;
     private ImageView mUserImage;
     private ViewPager mPager;
-    private LinkedList<String> mQueries;
+    private ArrayList<String> mQueries;
     private DrawerLayout mDrawer;
     private ListView mCategoriesList;
     private NYCategoriesAdapter mAdapter;
     private int mClickedPosition;
+    private Bitmap imageBitmap;
+    private final String TAG = MainActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        mQueries = generateCategoryList();
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity
         View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
 
         TextView mUserName = (TextView) headerView.findViewById(R.id.textView);
-        mUserName.setText(LogInSharedPreferences.getUsername(this));
+        String username = NYSharedPreferences.getsInstance().getUsername();
+
+        mUserName.setText(username);
         mUserImage = (ImageView) headerView.findViewById(R.id.imageView);
         mUserImage.setOnClickListener(new View.OnClickListener() {
 
@@ -123,17 +125,26 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        findViewById(R.id.setting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+
+
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setOffscreenPageLimit(2);
         PagerTabStrip tabStrip = (PagerTabStrip) mPager.findViewById(R.id.pagerTabStrip);
         tabStrip.setDrawFullUnderline(true);
         tabStrip.setTabIndicatorColor(ContextCompat.getColor(this, R.color.background_main));
-        NYFragmentPagerAdapter fragmentPagerAdapter = new NYFragmentPagerAdapter(getSupportFragmentManager());
+        NYFragmentPagerAdapter fragmentPagerAdapter = new NYFragmentPagerAdapter(getSupportFragmentManager(), mQueries);
         mPager.setAdapter(fragmentPagerAdapter);
 
         mCategoriesList = (ListView) mDrawer.findViewById(R.id.categories_list);
-        mCategoriesList.setDivider(null);
-        mCategoriesList.setDividerHeight(0);
         if (savedInstanceState != null) {
             mClickedPosition = savedInstanceState.getInt(Constants.CLICKED_POSITION);
         }
@@ -156,6 +167,9 @@ public class MainActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(Constants.CATEGORIES_LIST_ON_SAVE, mCategoriesList.onSaveInstanceState());
+        if (imageBitmap != null) {
+            outState.putParcelable(Constants.USER_IMAGE, imageBitmap);
+        }
         if (mAdapter.getClickedPosition() == 0) {
             outState.putInt(Constants.CLICKED_POSITION, mClickedPosition);
         } else {
@@ -167,6 +181,11 @@ public class MainActivity extends AppCompatActivity
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mCategoriesList.onRestoreInstanceState(savedInstanceState.getParcelable(Constants.CATEGORIES_LIST_ON_SAVE));
+        Bitmap tempBitmap = savedInstanceState.getParcelable(Constants.USER_IMAGE);
+        if (tempBitmap != null) {
+            imageBitmap = tempBitmap;
+            mUserImage.setImageBitmap(tempBitmap);
+        }
     }
 
     @Override
@@ -190,13 +209,11 @@ public class MainActivity extends AppCompatActivity
             case Constants.SELECT_PICTURE:
                 if (resultCode == Activity.RESULT_OK) {
                     Uri selectedImage = data.getData();
-                    Bitmap imageBitmap;
                     try {
                         imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                         mUserImage.setImageBitmap(imageBitmap);
-                        File f = new File(selectedImage.getPath());
-                        putImageToDB(f.getAbsolutePath());
-                        Toast.makeText(this, f.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                        File pictureFile = new File(selectedImage.getPath());
+                        putImageToDB(pictureFile.getAbsolutePath());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -205,11 +222,9 @@ public class MainActivity extends AppCompatActivity
             case Constants.CAPTURE_PICTURE:
                 if (resultCode == Activity.RESULT_OK) {
                     setPic();
-                    putImageToDB(mCurrentPhotoPath);
-                    Toast.makeText(this, mCurrentPhotoPath, Toast.LENGTH_SHORT).show();
+                    putImageToDB(mPhotoFile.getAbsolutePath());
                 }
                 break;
-            default:
         }
 
     }
@@ -224,27 +239,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -267,85 +261,50 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void putImageToDB(String path) {
-        Intent intent = getIntent();
-        String userName = intent.getStringExtra(getString(R.string.username));
-        ContentResolver resolver = getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(UserDb.DBColumns.PATH_TO_IMAGE, path);
-        String where = UserDb.DBColumns.USERNAME + " = " + userName;
-        resolver.update(UsersContract.TABLE_URI, values, where, null);
+    private void putImageToDB(final String path) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Intent intent = getIntent();
+                String userName = intent.getStringExtra(Constants.USERNAME);
+                ContentResolver resolver = getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(UserDb.DBColumns.PATH_TO_IMAGE, path);
+                String where = UserDb.DBColumns.USERNAME + " = " + userName;
+                resolver.update(UsersContract.TABLE_URI, values, where, null);
+            }
+        }).start();
+
     }
 
     private void setPic() {
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
-        mUserImage.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 500, 500, true));
+        Bitmap bitmap = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
+        imageBitmap = Bitmap.createScaledBitmap(bitmap, Constants.BITMAP_DIMENS, Constants.BITMAP_DIMENS, true);
+        mUserImage.setImageBitmap(imageBitmap);
     }
 
 
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_.jpg";
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), imageFileName);
-        mCurrentPhotoPath = file.getAbsolutePath();
-        return file;
+        return new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), imageFileName);
     }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
+            mPhotoFile = null;
             try {
-                photoFile = createImageFile();
+                mPhotoFile = createImageFile();
             } catch (IOException ex) {
+                Log.d(TAG, ex.toString());
             }
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.example.akremlov.fileprovider", photoFile);
+            if (mPhotoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, Constants.PHOTO_FILE_PROVIDER_AUTHORITY, mPhotoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, Constants.CAPTURE_PICTURE);
             }
-        }
-    }
-
-    private class NYFragmentPagerAdapter extends FragmentStatePagerAdapter {
-
-        public NYFragmentPagerAdapter(FragmentManager fm) {
-            super(fm);
-            mQueries = readAssets();
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return NYFragment.newInstance(mQueries.get(position));
-        }
-
-        @Override
-        public int getCount() {
-            return mQueries.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mQueries.get(position).trim();
-        }
-
-        public LinkedList<String> readAssets() {
-            LinkedList<String> list = new LinkedList<>();
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("articles.txt")));
-                while (true) {
-                    String articleName = bufferedReader.readLine();
-                    if (articleName == null) {
-                        break;
-                    }
-                    list.add(articleName.trim());
-                }
-                bufferedReader.close();
-                return list;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return new LinkedList<>();
         }
     }
 
@@ -358,5 +317,37 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void scrollTo(int position) {
         mCategoriesList.setSelection(position);
+    }
+
+    public ArrayList<String> readAssets() {
+        ArrayList<String> list = new ArrayList<>();
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("articles.txt")));
+            while (true) {
+                String articleName = bufferedReader.readLine();
+                if (articleName == null) {
+                    break;
+                }
+                list.add(articleName.trim());
+            }
+            bufferedReader.close();
+            return list;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private ArrayList<String> generateCategoryList() {
+        ArrayList<String> arrayList = readAssets();
+        Iterator<String> iterator = arrayList.iterator();
+        while (iterator.hasNext()) {
+            String category = iterator.next();
+            boolean isChecked = NYSharedPreferences.getsInstance().getCategoryPreference(category);
+            if (!isChecked) {
+                iterator.remove();
+            }
+        }
+        return arrayList;
     }
 }

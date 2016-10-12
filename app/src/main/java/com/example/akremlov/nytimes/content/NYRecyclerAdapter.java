@@ -21,6 +21,10 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
     private List<NYItem> mList;
     private OnScrollListener onScrollListener;
 
+    public interface OnScrollListener {
+        void onScrollEnd();
+    }
+
     public void setOnScrollListener(OnScrollListener onScrollListener) {
         this.onScrollListener = onScrollListener;
     }
@@ -39,7 +43,7 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        String imageUrl = mList.get(position).getmPhoto();
+        String imageUrl = mList.get(position).getPhoto();
 
         if (position == 0 && !TextUtils.isEmpty(imageUrl)) {
             holder.mFirstItemPhoto.setVisibility(View.VISIBLE);
@@ -56,35 +60,31 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
                 holder.mFirstItemPhoto.setVisibility(View.GONE);
             }
         }
-        holder.mHeadLine.setText(mList.get(position).getmHeadLine());
-        holder.mSnippet.setText(mList.get(position).getmSnippet());
+        holder.mHeadLine.setText(mList.get(position).getHeadLine());
+        holder.mSnippet.setText(mList.get(position).getSnippet());
 
         holder.mHeadLine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Uri webLink = Uri.parse(mList.get(position).getmWebUrl());
+//                Uri webLink = Uri.parse(mList.get(position).getWebUrl());
 //                Intent intent = new Intent(Intent.ACTION_VIEW, webLink);
 //                mContext.startActivity(intent);
 
                 Intent intent = new Intent(mContext, WebViewActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                intent.putExtra("url", mList.get(holder.getAdapterPosition()).getmWebUrl());
+                intent.putExtra("url", mList.get(holder.getAdapterPosition()).getWebUrl());
                 mContext.startActivity(intent);
             }
         });
 
-        int maxPosition = getItemCount();
-        if (position == maxPosition - 5) {
+        if (position == getItemCount() - 5) {
             onScrollListener.onScrollEnd();
         }
     }
 
     @Override
     public int getItemCount() {
-        if (mList == null) {
-            return 0;
-        }
-        return mList.size();
+        return mList == null ? 0 : mList.size();
     }
 
     @Override
@@ -94,6 +94,7 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
+
         private ImageView mItemPhoto;
         private CardView mCardView;
         private TextView mHeadLine;
@@ -108,9 +109,5 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
             mSnippet = (TextView) mCardView.findViewById(R.id.snippet);
             mFirstItemPhoto = (ImageView) mCardView.findViewById(R.id.first_item_photo);
         }
-    }
-
-    public interface OnScrollListener {
-        void onScrollEnd();
     }
 }

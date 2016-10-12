@@ -24,8 +24,10 @@
             android:id="@+id/categories_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="208dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginTop="@dimen/listview_margin_top"
+            android:layout_marginBottom="@dimen/listview_margin_bottom"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
 
     </android.support.design.widget.NavigationView>
 

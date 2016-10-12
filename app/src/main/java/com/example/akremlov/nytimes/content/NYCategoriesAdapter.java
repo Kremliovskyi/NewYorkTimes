@@ -19,9 +19,9 @@ public class NYCategoriesAdapter extends BaseAdapter {
     private ViewPagerCategoryListener mListener;
     private int mClickedPosition;
 
-    public NYCategoriesAdapter(List<DrawerItem> mDrawerItems, Context mContext) {
-        this.mDrawerItems = mDrawerItems;
-        this.mContext = mContext;
+    public NYCategoriesAdapter(List<DrawerItem> drawerItems, Context context) {
+        this.mDrawerItems = drawerItems;
+        this.mContext = context;
     }
 
     @Override
@@ -63,8 +63,8 @@ public class NYCategoriesAdapter extends BaseAdapter {
             public void onClick(View v) {
                 for (int i = 0; i < mDrawerItems.size(); i++) {
                     mDrawerItems.get(i).setSelected(i == position);
-                    notifyDataSetChanged();
                 }
+                notifyDataSetChanged();
                 setClickedPosition(position);
                 mListener.setFocus(position);
                 mListener.scrollTo(position);
@@ -85,6 +85,7 @@ public class NYCategoriesAdapter extends BaseAdapter {
 
     public interface ViewPagerCategoryListener {
         void setFocus(int position);
+
         void scrollTo(int position);
     }
 

@@ -16,7 +16,7 @@ import android.widget.EditText;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
-import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mCredentialsFromDB = getCredentialFromDB(cursor);
         if (validateCredentials()) {
-            LogInSharedPreferences.setBooleanValue(this, true);
+            NYSharedPreferences.getsInstance().setUserLoggedIn(true);
             finish();
         }
     }
@@ -71,10 +71,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mLoginButton.setOnClickListener(this);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+
 
     private boolean validateCredentials() {
         String userName = mUsernameLogIn.getText().toString();
@@ -82,8 +79,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         String userPass = mCredentialsFromDB.get(userName);
         if (userPass != null && userPass.equals(password)) {
             Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+            NYSharedPreferences.getsInstance().setUserName(userName);
             startActivity(intent);
-            LogInSharedPreferences.setUserName(this, userName);
             return true;
         }
         showAuthenticationFailedDialog();
@@ -126,7 +123,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 Intent landingActivityIntent = new Intent(this, LandingActivity.class);
                 startActivity(landingActivityIntent);
                 break;
-            default:
         }
     }
 

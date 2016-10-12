@@ -15,4 +15,21 @@
     <dimen name="drawer_category_size">18sp</dimen>
     <dimen name="category_side_padding">16dp</dimen>
     <dimen name="category_upper_lower_padding">8dp</dimen>
+    <dimen name="sign_up">48dp</dimen>
+    <dimen name="intro_top_margin">150dp</dimen>
+    <dimen name="settings_text_margin_start">80dp</dimen>
+    <dimen name="settings_text_size">22sp</dimen>
+    <dimen name="listview_margin_top">208dp</dimen>
+    <dimen name="listview_margin_bottom">8dp</dimen>
+    <dimen name="button_margin_bottom">40dp</dimen>
+    <dimen name="button_margin_top">26dp</dimen>
+    <dimen name="card_view_padding">15dp</dimen>
+    <dimen name="card_view_corner_radius">4dp</dimen>
+    <dimen name="card_view_margin">5dp</dimen>
+    <dimen name="big_image_measure">150dp</dimen>
+    <dimen name="big_image_margin_bottom">21dp</dimen>
+    <dimen name="big_image_padding">12dp</dimen>
+    <dimen name="little_image_width">350dp</dimen>
+    <dimen name="headline_text_size">16sp</dimen>
+    <dimen name="snippet_text_size">12sp</dimen>
 </resources>

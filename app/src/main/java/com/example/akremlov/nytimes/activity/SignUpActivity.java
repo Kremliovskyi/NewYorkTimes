@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
-import com.example.akremlov.nytimes.utils.LogInSharedPreferences;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SignUpActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class SignUpActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private EditText mUsernameInput;
     private AppCompatEditText mEmailInput;
@@ -136,7 +136,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         Snackbar.make(mLinearLayout, R.string.confirm_pass_incorrect, Snackbar.LENGTH_LONG).show();
                         enterPasswordInput.clear();
                         confirmPasswordInput.clear();
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(mConfirmPasswordInput.getWindowToken(), 0);
                         return;
                     }
@@ -170,8 +170,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     intent.putExtra(Constants.USERNAME, userName);
                     startActivity(intent);
-                    LogInSharedPreferences.setBooleanValue(SignUpActivity.this, true);
-                    LogInSharedPreferences.setUserName(SignUpActivity.this, userName);
+                    NYSharedPreferences.getsInstance().setUserLoggedIn(true);
+                    NYSharedPreferences.getsInstance().setUserName(userName);
                     finish();
                 } else {
                     Toast.makeText(SignUpActivity.this, R.string.fill_request, Toast.LENGTH_SHORT).show();
@@ -179,11 +179,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
 
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -201,13 +196,19 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
         return matcher.matches();
     }
 
-    public void createUserAccount(String username, String email, String password) {
-        ContentResolver resolver = getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(UserDb.DBColumns.USERNAME, username);
-        values.put(UserDb.DBColumns.EMAIL, email);
-        values.put(UserDb.DBColumns.PASSWORD, password);
-        values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
-        resolver.insert(UsersContract.TABLE_URI, values);
+    public void createUserAccount(final String username, final String email, final String password) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                ContentResolver resolver = getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(UserDb.DBColumns.USERNAME, username);
+                values.put(UserDb.DBColumns.EMAIL, email);
+                values.put(UserDb.DBColumns.PASSWORD, password);
+                values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
+                resolver.insert(UsersContract.TABLE_URI, values);
+            }
+        }).start();
     }
 }
