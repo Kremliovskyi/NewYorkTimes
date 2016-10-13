@@ -1,4 +1,5 @@
 package com.example.akremlov.nytimes.content;
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
@@ -9,9 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.activity.WebViewActivity;
+import com.example.akremlov.nytimes.utils.Constants;
 import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 
@@ -66,18 +70,14 @@ public class NYRecyclerAdapter extends RecyclerView.Adapter<NYRecyclerAdapter.Vi
         holder.mHeadLine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Uri webLink = Uri.parse(mList.get(position).getWebUrl());
-//                Intent intent = new Intent(Intent.ACTION_VIEW, webLink);
-//                mContext.startActivity(intent);
-
                 Intent intent = new Intent(mContext, WebViewActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                intent.putExtra("url", mList.get(holder.getAdapterPosition()).getWebUrl());
+                intent.putExtra(Constants.URL, mList.get(holder.getAdapterPosition()).getWebUrl());
                 mContext.startActivity(intent);
             }
         });
 
-        if (position == getItemCount() - 5) {
+        if (position >= getItemCount() - 5) {
             onScrollListener.onScrollEnd();
         }
     }

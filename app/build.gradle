@@ -31,4 +31,5 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.android.gms:play-services-gcm:9.6.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
+    compile 'commons-io:commons-io:2.4'
 }

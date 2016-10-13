@@ -29,7 +29,6 @@
     <string name="cancel">Cancel</string>
     <string name="fill_request">Please fill all fields</string>
     <string name="invalid_email">Please type valid email address</string>
-
     <string name="no_Photo_app">No application found to take pictures</string>
     <string name="set_image_title">Set image</string>
     <string name="set_image_text">Set image from gallery or take a new one ?</string>
@@ -47,4 +46,5 @@
     <string name="log_out_prompt">Do you want to log out ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="no_internet_connection">No connection to internet!</string>
 </resources>

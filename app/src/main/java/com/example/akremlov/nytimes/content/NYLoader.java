@@ -4,12 +4,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
+import android.text.Html;
 import android.text.TextUtils;
 
+import com.example.akremlov.nytimes.activity.MainActivity;
+import com.example.akremlov.nytimes.application.NewApplication;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.InternetChangeReceiver;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -33,7 +38,12 @@ public class NYLoader extends AsyncTaskLoader<List<NYItem>> {
         mNYItemList.clear();
         String query = mQueries.getString(Constants.QUERY);
         int pageNum = mQueries.getInt(Constants.PAGE_NUMBER);
-        return loadArticles(query, pageNum);
+        if (InternetChangeReceiver.isNetworkAvailable()) {
+            return loadArticles(query, pageNum);
+        } else {
+            return mNYItemList;
+        }
+
     }
 
     @Override
@@ -47,7 +57,7 @@ public class NYLoader extends AsyncTaskLoader<List<NYItem>> {
         String articleUrl = Uri.parse(Constants.ARTICLE_BASE)
                 .buildUpon()
                 .appendQueryParameter(Constants.API_KEY, Constants.ARTICLE_KEY)
-                .appendQueryParameter(Constants.FILTERRED_QUERY, "section_name:(\""+query+"\")")
+                .appendQueryParameter(Constants.FILTERED_QUERY, "section_name:(\"" + query + "\")")
                 .appendQueryParameter(Constants.PAGE, String.valueOf(pageNum))
                 .appendQueryParameter(Constants.SORT, Constants.NEWEST)
                 .build().toString();
@@ -72,7 +82,7 @@ public class NYLoader extends AsyncTaskLoader<List<NYItem>> {
         return mNYItemList;
     }
 
-    private NYItem parseItem (JsonObject articleObject) {
+    private NYItem parseItem(JsonObject articleObject) {
         String webUrl = articleObject.get(Constants.WEB_URL).getAsJsonPrimitive().getAsString();
         String snippet = articleObject.get(Constants.SNIPPET).isJsonPrimitive() ? articleObject.get(Constants.SNIPPET).getAsJsonPrimitive().getAsString() : "";
         String headline = articleObject.get(Constants.HEADLINE).getAsJsonObject().get(Constants.MAIN).isJsonPrimitive() ?
@@ -91,6 +101,13 @@ public class NYLoader extends AsyncTaskLoader<List<NYItem>> {
             image = "";
         }
         NYItem.NYItemBuilder builder = new NYItem.NYItemBuilder();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            snippet = Html.fromHtml(snippet, Html.FROM_HTML_MODE_LEGACY).toString();
+            headline = Html.fromHtml(headline, Html.FROM_HTML_MODE_LEGACY).toString();
+        } else {
+            snippet = Html.fromHtml(snippet).toString();
+            headline = Html.fromHtml(headline).toString();
+        }
         return builder.setWebUrl(webUrl).setSnippet(snippet).setHeadLine(headline).setPhoto(image).build();
     }
 

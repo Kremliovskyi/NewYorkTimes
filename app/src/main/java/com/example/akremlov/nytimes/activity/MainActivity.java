@@ -6,7 +6,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -26,6 +28,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -33,6 +36,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.content.DrawerItem;
@@ -40,12 +44,17 @@ import com.example.akremlov.nytimes.content.NYCategoriesAdapter;
 import com.example.akremlov.nytimes.content.NYFragmentPagerAdapter;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.InternetChangeReceiver;
 import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -69,10 +78,14 @@ public class MainActivity extends AppCompatActivity
     private Bitmap imageBitmap;
     private final String TAG = MainActivity.class.getName();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        if (!InternetChangeReceiver.isNetworkAvailable()) {
+            Toast.makeText(this, R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -92,6 +105,9 @@ public class MainActivity extends AppCompatActivity
 
         mUserName.setText(username);
         mUserImage = (ImageView) headerView.findViewById(R.id.imageView);
+
+        tryToSetImageFromDb();
+
         mUserImage.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -116,7 +132,7 @@ public class MainActivity extends AppCompatActivity
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                Intent intent = new Intent(Intent.ACTION_PICK);
                                 intent.setType("image/*");
                                 startActivityForResult(intent, Constants.SELECT_PICTURE);
                             }
@@ -126,6 +142,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         findViewById(R.id.setting).setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -134,8 +151,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
-
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setOffscreenPageLimit(2);
         PagerTabStrip tabStrip = (PagerTabStrip) mPager.findViewById(R.id.pagerTabStrip);
@@ -143,7 +158,6 @@ public class MainActivity extends AppCompatActivity
         tabStrip.setTabIndicatorColor(ContextCompat.getColor(this, R.color.background_main));
         NYFragmentPagerAdapter fragmentPagerAdapter = new NYFragmentPagerAdapter(getSupportFragmentManager(), mQueries);
         mPager.setAdapter(fragmentPagerAdapter);
-
         mCategoriesList = (ListView) mDrawer.findViewById(R.id.categories_list);
         if (savedInstanceState != null) {
             mClickedPosition = savedInstanceState.getInt(Constants.CLICKED_POSITION);
@@ -153,6 +167,7 @@ public class MainActivity extends AppCompatActivity
         mAdapter.setListener(this);
         mCategoriesList.setAdapter(mAdapter);
     }
+
 
     private List<DrawerItem> generateDrawerList(int mClickedPosition) {
         List<DrawerItem> itemList = new ArrayList<>(mQueries.size());
@@ -210,10 +225,16 @@ public class MainActivity extends AppCompatActivity
                 if (resultCode == Activity.RESULT_OK) {
                     Uri selectedImage = data.getData();
                     try {
-                        imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                        mUserImage.setImageBitmap(imageBitmap);
-                        File pictureFile = new File(selectedImage.getPath());
-                        putImageToDB(pictureFile.getAbsolutePath());
+                        InputStream inputStream = getContentResolver().openInputStream(selectedImage);
+                        if (inputStream != null) {
+                            File savedImage = new File(getFilesDir(), new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()));
+                            FileOutputStream outputStream = new FileOutputStream(savedImage);
+                            outputStream.write(IOUtils.toByteArray(inputStream));
+                            inputStream.close();
+                            outputStream.close();
+                            setPic(savedImage.getPath());
+                            putImageToDB(savedImage.getPath());
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -221,7 +242,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Constants.CAPTURE_PICTURE:
                 if (resultCode == Activity.RESULT_OK) {
-                    setPic();
+                    setPic(mPhotoFile.getAbsolutePath());
                     putImageToDB(mPhotoFile.getAbsolutePath());
                 }
                 break;
@@ -271,15 +292,14 @@ public class MainActivity extends AppCompatActivity
                 ContentResolver resolver = getContentResolver();
                 ContentValues values = new ContentValues();
                 values.put(UserDb.DBColumns.PATH_TO_IMAGE, path);
-                String where = UserDb.DBColumns.USERNAME + " = " + userName;
-                resolver.update(UsersContract.TABLE_URI, values, where, null);
+                String where = UserDb.DBColumns.USERNAME + "=?";
+                resolver.update(UsersContract.TABLE_URI, values, where, new String[]{userName});
             }
         }).start();
-
     }
 
-    private void setPic() {
-        Bitmap bitmap = BitmapFactory.decodeFile(mPhotoFile.getAbsolutePath());
+    private void setPic(String photoFile) {
+        Bitmap bitmap = BitmapFactory.decodeFile(photoFile);
         imageBitmap = Bitmap.createScaledBitmap(bitmap, Constants.BITMAP_DIMENS, Constants.BITMAP_DIMENS, true);
         mUserImage.setImageBitmap(imageBitmap);
     }
@@ -350,4 +370,34 @@ public class MainActivity extends AppCompatActivity
         }
         return arrayList;
     }
+
+    private void tryToSetImageFromDb() {
+        Intent intent = getIntent();
+        final String userName = intent.getStringExtra(Constants.USERNAME);
+        getLoaderManager().initLoader(1, null, new android.app.LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                return new android.content.CursorLoader(MainActivity.this, UsersContract.TABLE_URI, new String[]{UserDb.DBColumns.PATH_TO_IMAGE},
+                        UserDb.DBColumns.USERNAME + "=?", new String[]{userName}, null);
+            }
+
+            @Override
+            public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
+                String pathToImage;
+                if (cursor != null) {
+                    cursor.moveToFirst();
+                    pathToImage = cursor.getString(cursor.getColumnIndex(UserDb.DBColumns.PATH_TO_IMAGE));
+                    if (!TextUtils.isEmpty(pathToImage)) {
+                        setPic(pathToImage);
+                    }
+                }
+            }
+
+            @Override
+            public void onLoaderReset(android.content.Loader<Cursor> loader) {
+
+            }
+        }).forceLoad();
+    }
+
 }

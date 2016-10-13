@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
+
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.content.FilterView;
+import com.example.akremlov.nytimes.utils.Constants;
 import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 
 import java.io.BufferedReader;
@@ -65,7 +67,8 @@ public class FilterActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(16, 16, 16, 16);
+        params.setMargins(Constants.LINEAR_LAYOUT_MARGIN, Constants.LINEAR_LAYOUT_MARGIN,
+                Constants.LINEAR_LAYOUT_MARGIN, Constants.LINEAR_LAYOUT_MARGIN);
         filterView.setLayoutParams(params);
         filterView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +110,7 @@ public class FilterActivity extends AppCompatActivity {
 
     private void populateLayouts() {
         LinearLayout newLayout = createNextLayout();
-        int generalWidth = 20;
+        int generalWidth = Constants.FILTER_VIEW_MARGIN;
         int layoutWidth = mLayout.getWidth();
         Map<FilterView, Integer> tempMap = new LinkedHashMap<>();
         for (int i = 0; i < mLayout.getChildCount(); i++) {
@@ -119,9 +122,9 @@ public class FilterActivity extends AppCompatActivity {
         while (iterator.hasNext()) {
             HashMap.Entry<FilterView, Integer> entry = iterator.next();
             if (entry != null) {
-                generalWidth += entry.getValue() + 20;
+                generalWidth += entry.getValue() + Constants.FILTER_VIEW_MARGIN;
                 if (generalWidth >= layoutWidth) {
-                    generalWidth = 40 + entry.getValue();
+                    generalWidth = Constants.FILTER_VIEW_MARGIN * 2 + entry.getValue();
                     mLinearLayout.addView(newLayout);
                     newLayout = createNextLayout();
                 }

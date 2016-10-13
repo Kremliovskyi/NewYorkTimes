@@ -32,4 +32,8 @@
     <dimen name="little_image_width">350dp</dimen>
     <dimen name="headline_text_size">16sp</dimen>
     <dimen name="snippet_text_size">12sp</dimen>
+    <dimen name="button_margin_top_lgin">80dp</dimen>
+    <dimen name="recycler_view_padding">5dp</dimen>
+    <dimen name="nav_header_text_size">16sp</dimen>
+    <dimen name="nav_header_text_padding">8dp</dimen>
 </resources>

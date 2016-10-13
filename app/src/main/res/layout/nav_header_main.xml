@@ -27,7 +27,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="16sp"
-        android:padding="8dp"/>
+        android:textSize="@dimen/nav_header_text_size"
+        android:padding="@dimen/nav_header_text_padding"/>
 
 </LinearLayout>

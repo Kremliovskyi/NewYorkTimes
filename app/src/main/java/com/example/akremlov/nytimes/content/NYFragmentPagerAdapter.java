@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.example.akremlov.nytimes.fragment.NYFragment;
+import com.example.akremlov.nytimes.utils.InternetChangeReceiver;
 
 import java.util.ArrayList;
 

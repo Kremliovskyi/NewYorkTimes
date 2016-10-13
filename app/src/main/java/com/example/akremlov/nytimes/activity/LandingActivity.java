@@ -16,6 +16,7 @@ public class LandingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (NYSharedPreferences.getsInstance().getUserLoggedIn()) {
             Intent intent = new Intent(LandingActivity.this, MainActivity.class);
+            intent.putExtra(Constants.USERNAME, NYSharedPreferences.getsInstance().getUsername());
             startActivity(intent);
             finish();
         }

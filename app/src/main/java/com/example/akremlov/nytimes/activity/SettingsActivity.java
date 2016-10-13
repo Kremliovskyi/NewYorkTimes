@@ -8,6 +8,8 @@ import android.view.View;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.fragment.NYPreferenceFragment;
+import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -43,6 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(Constants.USERNAME, NYSharedPreferences.getsInstance().getUsername());
         startActivity(intent);
         finish();
     }

@@ -1,6 +1,7 @@
 package com.example.akremlov.nytimes.fragment;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,22 +10,23 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.content.NYLoader;
 import com.example.akremlov.nytimes.content.NYItem;
 import com.example.akremlov.nytimes.content.NYRecyclerAdapter;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.InternetChangeReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NYFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<NYItem>>,
-        NYRecyclerAdapter.OnScrollListener, SwipeRefreshLayout.OnRefreshListener {
+        NYRecyclerAdapter.OnScrollListener, SwipeRefreshLayout.OnRefreshListener, InternetChangeReceiver.OnInternetListener {
 
     private NYRecyclerAdapter nyRecyclerAdapter;
     private Context mContext;
@@ -32,6 +34,7 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     private LinearLayoutManager mLinearLayoutManager;
     private ArrayList<NYItem> mDataList = new ArrayList<>();
     private SwipeRefreshLayout mFragment;
+    private InternetChangeReceiver mInternetReceiver = new InternetChangeReceiver();
 
     @Override
     public void onScrollEnd() {
@@ -58,6 +61,19 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
             mLinearLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(Constants.LAYOUT_MANAGER));
             mDataList = savedInstanceState.getParcelableArrayList(Constants.DATA);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mContext.registerReceiver(mInternetReceiver, new IntentFilter(Constants.CONNECTIVITY_CHANGE));
+        mInternetReceiver.setListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mContext.unregisterReceiver(mInternetReceiver);
     }
 
     @Override
@@ -90,16 +106,8 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
 
     @Override
     public void onLoadFinished(Loader<List<NYItem>> loader, List<NYItem> data) {
-/**    For testing. Filter items with image only
- Iterator<NYItem> itemIterator = data.iterator();
- while(itemIterator.hasNext()){
- if(TextUtils.isEmpty(itemIterator.next().getPhoto())){
- itemIterator.remove();
- }
- }
- */
 
-        if (data.isEmpty()) {
+        if (data.isEmpty() && InternetChangeReceiver.isNetworkAvailable()) {
             retryLoading();
             return;
         }
@@ -107,7 +115,6 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
             return;
         }
         if (loader.getId() == Constants.ARTICLES) {
-
             mDataList.addAll(data);
         } else if (loader.getId() == Constants.REFRESH_ARTICLES) {
             mDataList.addAll(0, data);
@@ -122,22 +129,38 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     }
 
     public void initiateNewLoading() {
-        pageNum++;
-        Bundle bundle = getArguments();
-        bundle.putInt(Constants.PAGE_NUMBER, pageNum);
-        getLoaderManager().restartLoader(Constants.ARTICLES, bundle, this).forceLoad();
+        if (InternetChangeReceiver.isNetworkAvailable()) {
+            pageNum++;
+            Bundle bundle = getArguments();
+            bundle.putInt(Constants.PAGE_NUMBER, pageNum);
+            getLoaderManager().restartLoader(Constants.ARTICLES, bundle, this).forceLoad();
+        } else {
+            Toast.makeText(getActivity(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
     public void onRefresh() {
-        pageNum = 0;
-        Bundle bundle = getArguments();
-        bundle.putInt(Constants.PAGE_NUMBER, 0);
-        getLoaderManager().restartLoader(Constants.REFRESH_ARTICLES, bundle, this).forceLoad();
-        mFragment.setRefreshing(false);
+        if (InternetChangeReceiver.isNetworkAvailable()) {
+            pageNum = 0;
+            Bundle bundle = getArguments();
+            bundle.putInt(Constants.PAGE_NUMBER, 0);
+            getLoaderManager().restartLoader(Constants.REFRESH_ARTICLES, bundle, this).forceLoad();
+            mFragment.setRefreshing(false);
+        } else {
+            Toast.makeText(getActivity(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show();
+            mFragment.setRefreshing(false);
+        }
+
     }
 
     public void retryLoading() {
         getLoaderManager().restartLoader(Constants.ARTICLES, getArguments(), this).forceLoad();
+    }
+
+    @Override
+    public void initiateLoading() {
+        retryLoading();
     }
 }

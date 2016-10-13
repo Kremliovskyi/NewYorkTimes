@@ -9,6 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.example.akremlov.nytimes.R;
+import com.example.akremlov.nytimes.utils.Constants;
 
 public class WebViewActivity extends AppCompatActivity {
 
@@ -24,8 +25,8 @@ public class WebViewActivity extends AppCompatActivity {
         webSettings.setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new Callback());
         if (savedInstanceState == null) {
-            if (getIntent() != null && getIntent().getStringExtra("url") != null) {
-                mWebView.loadUrl(getIntent().getStringExtra("url"));
+            if (getIntent() != null && getIntent().getStringExtra(Constants.URL) != null) {
+                mWebView.loadUrl(getIntent().getStringExtra(Constants.URL));
             }
         }
     }
