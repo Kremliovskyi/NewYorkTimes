@@ -22,12 +22,14 @@ public class InternetChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info;
-        if ((info = connectivity.getActiveNetworkInfo()) != null) {
-            if (info.getState() == NetworkInfo.State.CONNECTED || info.getState() == NetworkInfo.State.CONNECTING) {
-                if (mListener != null) {
-                    mListener.initiateLoading();
+        if (!isInitialStickyBroadcast()) {
+            ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info;
+            if ((info = connectivity.getActiveNetworkInfo()) != null) {
+                if (info.getState() == NetworkInfo.State.CONNECTED || info.getState() == NetworkInfo.State.CONNECTING) {
+                    if (mListener != null) {
+                        mListener.initiateLoading();
+                    }
                 }
             }
         }

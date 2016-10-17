@@ -41,11 +41,18 @@
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>
 
-    <fragment
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/sett_fragment"
-        android:layout_below="@id/set_toolbar"
-        android:name="com.example.akremlov.nytimes.fragment.NYPreferenceFragment" />
+        android:layout_below="@id/set_toolbar">
+
+        <FrameLayout
+            android:id="@+id/sett_fragment"
+            android:name="com.example.akremlov.nytimes.fragment.NYPreferenceFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
 
 </RelativeLayout>

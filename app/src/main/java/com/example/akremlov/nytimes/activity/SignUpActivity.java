@@ -167,13 +167,12 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         return;
                     }
 
-                    createUserAccount(userName, email, password);
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
                     intent.putExtra(Constants.USERNAME, userName);
                     startActivity(intent);
                     NYSharedPreferences.getsInstance().setUserLoggedIn(true);
                     NYSharedPreferences.getsInstance().setUserName(userName);
-                    finish();
+                    createUserAccount(userName, email, password);
                 } else {
                     Toast.makeText(SignUpActivity.this, R.string.fill_request, Toast.LENGTH_SHORT).show();
                 }
@@ -199,10 +198,15 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
 
     public void createUserAccount(String username, String email, String password) {
 
-        AsyncTask<String, Void, Void> asyncTask = new AsyncTask<String, Void, Void>() {
+        AsyncTask<String, Void, Boolean> asyncTask = new AsyncTask<String, Void, Boolean>() {
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                finish();
+            }
 
             @Override
-            protected Void doInBackground(String... params) {
+            protected Boolean doInBackground(String... params) {
                 ContentResolver resolver = getContentResolver();
                 ContentValues values = new ContentValues();
                 values.put(UserDb.DBColumns.USERNAME, params[0]);
@@ -210,10 +214,11 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                 values.put(UserDb.DBColumns.PASSWORD, params[2]);
                 values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
                 resolver.insert(UsersContract.TABLE_URI, values);
-                return null;
+                return true;
             }
         };
 
         asyncTask.execute(username, email, password);
+
     }
 }

@@ -52,4 +52,5 @@ public final class Constants {
     public static final int FILTER_VIEW_TEXT_Y = 65;
     public static final int FILTER_VIEW_ARC_START_ANGLE = 100;
     public static final int FILTER_VIEW_ARC_SWEEP_ANGLE = 200;
+    public static final int TIMES_TO_TRY_DOWNLOADING = 7;
 }

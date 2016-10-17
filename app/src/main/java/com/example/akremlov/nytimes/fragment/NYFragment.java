@@ -36,10 +36,12 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     private ArrayList<NYItem> mDataList = new ArrayList<>();
     private SwipeRefreshLayout mFragment;
     private ProgressBar mProgressBar;
+    private int mTries = 0;
     private InternetChangeReceiver mInternetReceiver = new InternetChangeReceiver();
 
     @Override
     public void onScrollEnd() {
+        mProgressBar.setVisibility(View.GONE);
         initiateNewLoading();
     }
 
@@ -98,7 +100,10 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         recyclerView.setLayoutManager(mLinearLayoutManager);
         recyclerView.setAdapter(mRecyclerAdapter);
         mRecyclerAdapter.setOnScrollListener(this);
-        getLoaderManager().initLoader(Constants.ARTICLES, getArguments(), this);
+        if (savedInstanceState == null) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            getLoaderManager().initLoader(Constants.ARTICLES, getArguments(), this);
+        }
         return mFragment;
     }
 
@@ -110,6 +115,7 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     @Override
     public void onLoadFinished(Loader<List<NYItem>> loader, List<NYItem> data) {
 
+
         if (data.isEmpty() && InternetChangeReceiver.isNetworkAvailable()) {
             retryLoading();
             return;
@@ -117,7 +123,8 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
             mProgressBar.setVisibility(View.GONE);
             return;
         }
-        if (mDataList.containsAll(data)) {
+        if (!mDataList.isEmpty() && mDataList.containsAll(data)) {
+            mProgressBar.setVisibility(View.GONE);
             return;
         }
         if (loader.getId() == Constants.ARTICLES) {
@@ -125,6 +132,7 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         } else if (loader.getId() == Constants.REFRESH_ARTICLES) {
             mDataList.addAll(0, data);
         }
+        mTries = 0;
         mRecyclerAdapter.notifyDataSetChanged();
         mProgressBar.setVisibility(View.GONE);
     }
@@ -150,8 +158,10 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     public void onRefresh() {
         if (InternetChangeReceiver.isNetworkAvailable()) {
             pageNum = 0;
+            mTries = 0;
             Bundle bundle = getArguments();
             bundle.putInt(Constants.PAGE_NUMBER, 0);
+            mProgressBar.setVisibility(View.VISIBLE);
             getLoaderManager().restartLoader(Constants.REFRESH_ARTICLES, bundle, this).forceLoad();
             mFragment.setRefreshing(false);
         } else {
@@ -162,6 +172,11 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     }
 
     public void retryLoading() {
+        mTries++;
+        if (mTries == Constants.TIMES_TO_TRY_DOWNLOADING) {
+            mProgressBar.setVisibility(View.GONE);
+            return;
+        }
         mProgressBar.setVisibility(View.VISIBLE);
         getLoaderManager().restartLoader(Constants.ARTICLES, getArguments(), this).forceLoad();
     }

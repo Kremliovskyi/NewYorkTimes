@@ -26,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        getFragmentManager().beginTransaction().replace(R.id.sett_fragment,
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new NYPreferenceFragment()).commit();
 
     }
