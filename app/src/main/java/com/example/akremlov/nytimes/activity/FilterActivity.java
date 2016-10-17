@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.content.FilterView;
+import com.example.akremlov.nytimes.utils.AssetsReader;
 import com.example.akremlov.nytimes.utils.Constants;
 import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 
@@ -46,7 +47,7 @@ public class FilterActivity extends AppCompatActivity {
             }
         });
 
-        mCategories = readAssets();
+        mCategories = AssetsReader.readAssets();
         Iterator<String> iterator = mCategories.iterator();
         while (iterator.hasNext()) {
             String categoryName = iterator.next();
@@ -87,25 +88,6 @@ public class FilterActivity extends AppCompatActivity {
         layout.setLayoutParams(params);
 
         return layout;
-    }
-
-    public ArrayList<String> readAssets() {
-        ArrayList<String> list = new ArrayList<>();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("articles.txt")));
-            while (true) {
-                String articleName = bufferedReader.readLine();
-                if (articleName == null) {
-                    break;
-                }
-                list.add(articleName.trim());
-            }
-            bufferedReader.close();
-            return list;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
     }
 
     private void populateLayouts() {

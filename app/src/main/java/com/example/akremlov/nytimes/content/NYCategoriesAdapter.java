@@ -79,8 +79,8 @@ public class NYCategoriesAdapter extends BaseAdapter {
     }
 
 
-    public void setListener(ViewPagerCategoryListener mListener) {
-        this.mListener = mListener;
+    public void setListener(ViewPagerCategoryListener listener) {
+        this.mListener = listener;
     }
 
     public interface ViewPagerCategoryListener {
@@ -89,8 +89,8 @@ public class NYCategoriesAdapter extends BaseAdapter {
         void scrollTo(int position);
     }
 
-    public void setClickedPosition(int mClickedPosition) {
-        this.mClickedPosition = mClickedPosition;
+    public void setClickedPosition(int clickedPosition) {
+        this.mClickedPosition = clickedPosition;
     }
 
     public int getClickedPosition() {

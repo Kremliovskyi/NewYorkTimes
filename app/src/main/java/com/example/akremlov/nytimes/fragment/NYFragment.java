@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.akremlov.nytimes.R;
@@ -28,12 +29,13 @@ import java.util.List;
 public class NYFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<NYItem>>,
         NYRecyclerAdapter.OnScrollListener, SwipeRefreshLayout.OnRefreshListener, InternetChangeReceiver.OnInternetListener {
 
-    private NYRecyclerAdapter nyRecyclerAdapter;
+    private NYRecyclerAdapter mRecyclerAdapter;
     private Context mContext;
     private int pageNum = 0;
     private LinearLayoutManager mLinearLayoutManager;
     private ArrayList<NYItem> mDataList = new ArrayList<>();
     private SwipeRefreshLayout mFragment;
+    private ProgressBar mProgressBar;
     private InternetChangeReceiver mInternetReceiver = new InternetChangeReceiver();
 
     @Override
@@ -90,11 +92,12 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mFragment = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment, null, false);
         mFragment.setOnRefreshListener(this);
+        mProgressBar = (ProgressBar) mFragment.findViewById(R.id.progressBar);
         RecyclerView recyclerView = (RecyclerView) mFragment.findViewById(R.id.recycler);
-        nyRecyclerAdapter = new NYRecyclerAdapter(getActivity(), mDataList);
+        mRecyclerAdapter = new NYRecyclerAdapter(getActivity(), mDataList);
         recyclerView.setLayoutManager(mLinearLayoutManager);
-        recyclerView.setAdapter(nyRecyclerAdapter);
-        nyRecyclerAdapter.setOnScrollListener(this);
+        recyclerView.setAdapter(mRecyclerAdapter);
+        mRecyclerAdapter.setOnScrollListener(this);
         getLoaderManager().initLoader(Constants.ARTICLES, getArguments(), this);
         return mFragment;
     }
@@ -110,6 +113,9 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         if (data.isEmpty() && InternetChangeReceiver.isNetworkAvailable()) {
             retryLoading();
             return;
+        } else if (data.isEmpty() && !(InternetChangeReceiver.isNetworkAvailable())) {
+            mProgressBar.setVisibility(View.GONE);
+            return;
         }
         if (mDataList.containsAll(data)) {
             return;
@@ -119,8 +125,8 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
         } else if (loader.getId() == Constants.REFRESH_ARTICLES) {
             mDataList.addAll(0, data);
         }
-        nyRecyclerAdapter.notifyDataSetChanged();
-
+        mRecyclerAdapter.notifyDataSetChanged();
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -156,6 +162,7 @@ public class NYFragment extends Fragment implements LoaderManager.LoaderCallback
     }
 
     public void retryLoading() {
+        mProgressBar.setVisibility(View.VISIBLE);
         getLoaderManager().restartLoader(Constants.ARTICLES, getArguments(), this).forceLoad();
     }
 

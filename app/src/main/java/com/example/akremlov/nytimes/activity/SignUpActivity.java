@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -196,19 +197,23 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
         return matcher.matches();
     }
 
-    public void createUserAccount(final String username, final String email, final String password) {
-        new Thread(new Runnable() {
+    public void createUserAccount(String username, String email, String password) {
+
+        AsyncTask<String, Void, Void> asyncTask = new AsyncTask<String, Void, Void>() {
 
             @Override
-            public void run() {
+            protected Void doInBackground(String... params) {
                 ContentResolver resolver = getContentResolver();
                 ContentValues values = new ContentValues();
-                values.put(UserDb.DBColumns.USERNAME, username);
-                values.put(UserDb.DBColumns.EMAIL, email);
-                values.put(UserDb.DBColumns.PASSWORD, password);
+                values.put(UserDb.DBColumns.USERNAME, params[0]);
+                values.put(UserDb.DBColumns.EMAIL, params[1]);
+                values.put(UserDb.DBColumns.PASSWORD, params[2]);
                 values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
                 resolver.insert(UsersContract.TABLE_URI, values);
+                return null;
             }
-        }).start();
+        };
+
+        asyncTask.execute(username, email, password);
     }
 }

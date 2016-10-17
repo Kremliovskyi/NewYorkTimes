@@ -5,24 +5,24 @@ public class DrawerItem {
     private String mTitle;
     private boolean mSelected;
 
-    public DrawerItem(String mTitle, boolean mSelected) {
-        this.mTitle = mTitle;
-        this.mSelected = mSelected;
+    public DrawerItem(String title, boolean selected) {
+        this.mTitle = title;
+        this.mSelected = selected;
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String mTitle) {
-        this.mTitle = mTitle;
+    public void setTitle(String title) {
+        this.mTitle = title;
     }
 
     public boolean isSelected() {
         return mSelected;
     }
 
-    public void setSelected(boolean mSelected) {
-        this.mSelected = mSelected;
+    public void setSelected(boolean selected) {
+        this.mSelected = selected;
     }
 }

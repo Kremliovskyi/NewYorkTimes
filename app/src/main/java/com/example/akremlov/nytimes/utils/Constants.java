@@ -34,7 +34,8 @@ public final class Constants {
     public static final int SELECT_PICTURE = 1;
     public static final int CAPTURE_PICTURE = 2;
     public static final int PERMISSION_REQUEST_CAMERA = 20;
-    public static final int BITMAP_DIMENS = 300;
+    public static final int BITMAP_WIDTH = 750;
+    public static final int BITMAP_HEIGHT = 600;
     public static final String PHOTO_FILE_PROVIDER_AUTHORITY = "com.example.akremlov.fileprovider";
     public static final String USER_IMAGE = "userImage";
     public static final String CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";

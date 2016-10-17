@@ -43,7 +43,6 @@ public class NYLoader extends AsyncTaskLoader<List<NYItem>> {
         } else {
             return mNYItemList;
         }
-
     }
 
     @Override

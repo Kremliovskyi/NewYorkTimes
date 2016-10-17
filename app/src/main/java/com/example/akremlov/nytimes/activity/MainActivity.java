@@ -43,10 +43,12 @@ import com.example.akremlov.nytimes.content.DrawerItem;
 import com.example.akremlov.nytimes.content.NYCategoriesAdapter;
 import com.example.akremlov.nytimes.content.NYFragmentPagerAdapter;
 import com.example.akremlov.nytimes.database.UserDb;
+import com.example.akremlov.nytimes.utils.AssetsReader;
 import com.example.akremlov.nytimes.utils.Constants;
 import com.example.akremlov.nytimes.utils.InternetChangeReceiver;
 import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
+import com.squareup.picasso.Picasso;
 
 import org.apache.commons.io.IOUtils;
 
@@ -169,10 +171,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private List<DrawerItem> generateDrawerList(int mClickedPosition) {
+    private List<DrawerItem> generateDrawerList(int clickedPosition) {
         List<DrawerItem> itemList = new ArrayList<>(mQueries.size());
         for (int i = 0; i < mQueries.size(); i++) {
-            DrawerItem drawerItem = new DrawerItem(mQueries.get(i), i == mClickedPosition);
+            DrawerItem drawerItem = new DrawerItem(mQueries.get(i), i == clickedPosition);
             itemList.add(drawerItem);
         }
         return itemList;
@@ -298,10 +300,9 @@ public class MainActivity extends AppCompatActivity
         }).start();
     }
 
-    private void setPic(String photoFile) {
-        Bitmap bitmap = BitmapFactory.decodeFile(photoFile);
-        imageBitmap = Bitmap.createScaledBitmap(bitmap, Constants.BITMAP_DIMENS, Constants.BITMAP_DIMENS, true);
-        mUserImage.setImageBitmap(imageBitmap);
+    private void setPic(String photoFilePath) {
+        Picasso.with(this).load(new File(photoFilePath))
+                .resize(Constants.BITMAP_WIDTH, Constants.BITMAP_HEIGHT).centerCrop().into(mUserImage);
     }
 
 
@@ -339,27 +340,8 @@ public class MainActivity extends AppCompatActivity
         mCategoriesList.setSelection(position);
     }
 
-    public ArrayList<String> readAssets() {
-        ArrayList<String> list = new ArrayList<>();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("articles.txt")));
-            while (true) {
-                String articleName = bufferedReader.readLine();
-                if (articleName == null) {
-                    break;
-                }
-                list.add(articleName.trim());
-            }
-            bufferedReader.close();
-            return list;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
-
     private ArrayList<String> generateCategoryList() {
-        ArrayList<String> arrayList = readAssets();
+        ArrayList<String> arrayList = AssetsReader.readAssets();
         Iterator<String> iterator = arrayList.iterator();
         while (iterator.hasNext()) {
             String category = iterator.next();
@@ -372,9 +354,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void tryToSetImageFromDb() {
+
         Intent intent = getIntent();
         final String userName = intent.getStringExtra(Constants.USERNAME);
         getLoaderManager().initLoader(1, null, new android.app.LoaderManager.LoaderCallbacks<Cursor>() {
+
             @Override
             public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
                 return new android.content.CursorLoader(MainActivity.this, UsersContract.TABLE_URI, new String[]{UserDb.DBColumns.PATH_TO_IMAGE},
