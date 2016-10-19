@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SignUpActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class SignUpActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private EditText mUsernameInput;
     private AppCompatEditText mEmailInput;
@@ -135,7 +137,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         Snackbar.make(mLinearLayout, R.string.confirm_pass_incorrect, Snackbar.LENGTH_LONG).show();
                         enterPasswordInput.clear();
                         confirmPasswordInput.clear();
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(mConfirmPasswordInput.getWindowToken(), 0);
                         return;
                     }
@@ -151,6 +153,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                                         Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
                                         intent.putExtra(Constants.ACTIVITY, Constants.SIGN_UP_ACTIVITY);
                                         startActivity(intent);
+                                        finish();
                                     }
                                 })
                                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -164,10 +167,12 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
                         return;
                     }
 
-                    createUserAccount(userName, email, password);
                     Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
-                    intent.putExtra(getString(R.string.username), userName);
+                    intent.putExtra(Constants.USERNAME, userName);
                     startActivity(intent);
+                    NYSharedPreferences.getsInstance().setUserLoggedIn(true);
+                    NYSharedPreferences.getsInstance().setUserName(userName);
+                    createUserAccount(userName, email, password);
                 } else {
                     Toast.makeText(SignUpActivity.this, R.string.fill_request, Toast.LENGTH_SHORT).show();
                 }
@@ -192,12 +197,28 @@ public class SignUpActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     public void createUserAccount(String username, String email, String password) {
-        ContentResolver resolver = getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(UserDb.DBColumns.USERNAME, username);
-        values.put(UserDb.DBColumns.EMAIL, email);
-        values.put(UserDb.DBColumns.PASSWORD, password);
-        values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
-        resolver.insert(UsersContract.TABLE_URI, values);
+
+        AsyncTask<String, Void, Boolean> asyncTask = new AsyncTask<String, Void, Boolean>() {
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                finish();
+            }
+
+            @Override
+            protected Boolean doInBackground(String... params) {
+                ContentResolver resolver = getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(UserDb.DBColumns.USERNAME, params[0]);
+                values.put(UserDb.DBColumns.EMAIL, params[1]);
+                values.put(UserDb.DBColumns.PASSWORD, params[2]);
+                values.put(UserDb.DBColumns.PATH_TO_IMAGE, "");
+                resolver.insert(UsersContract.TABLE_URI, values);
+                return true;
+            }
+        };
+
+        asyncTask.execute(username, email, password);
+
     }
 }

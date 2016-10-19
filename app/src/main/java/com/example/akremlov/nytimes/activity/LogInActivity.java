@@ -16,6 +16,7 @@ import android.widget.EditText;
 import com.example.akremlov.nytimes.R;
 import com.example.akremlov.nytimes.database.UserDb;
 import com.example.akremlov.nytimes.utils.Constants;
+import com.example.akremlov.nytimes.utils.NYSharedPreferences;
 import com.example.akremlov.nytimes.utils.UsersContract;
 
 import java.util.HashMap;
@@ -38,13 +39,14 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mCredentialsFromDB = getCredentialFromDB(cursor);
         if (validateCredentials()) {
+            NYSharedPreferences.getsInstance().setUserLoggedIn(true);
             finish();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        loader.reset();
     }
 
     @Override
@@ -69,12 +71,15 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         mLoginButton.setOnClickListener(this);
     }
 
+
+
     private boolean validateCredentials() {
         String userName = mUsernameLogIn.getText().toString();
         String password = mPasswordLogin.getText().toString();
         String userPass = mCredentialsFromDB.get(userName);
         if (userPass != null && userPass.equals(password)) {
             Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+            NYSharedPreferences.getsInstance().setUserName(userName);
             startActivity(intent);
             return true;
         }
@@ -118,7 +123,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
                 Intent landingActivityIntent = new Intent(this, LandingActivity.class);
                 startActivity(landingActivityIntent);
                 break;
-            default:
         }
     }
 
