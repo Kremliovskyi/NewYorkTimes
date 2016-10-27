@@ -45,7 +45,7 @@ public class UsersProvider extends ContentProvider {
                         UserDb.DBColumns.PASSWORD, UserDb.DBColumns.PATH_TO_IMAGE}, BaseColumns._ID + " = " +
                         UsersContract.getUserId(uri), selectionArgs, null, null, sortOrder);
             case USERS:
-                return database.query(UserDb.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                return database.query(UserDb.TABLE_NAME, projection, null, null, null, null, sortOrder);
             default:
                 throw new IllegalArgumentException("Incorrect URI " + uri);
 
